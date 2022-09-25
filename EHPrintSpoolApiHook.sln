@@ -7,6 +7,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "InjectUtility", "InjectUtil
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PSHook", "PSHook\PSHook.vcxproj", "{515F74DD-D4D8-4B61-8C77-A2686570E99F}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PSUtility", "PSUtility\PSUtility.vcxproj", "{86DE18DE-0C77-46C6-8ADF-1F6486FB9909}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -31,6 +33,14 @@ Global
 		{515F74DD-D4D8-4B61-8C77-A2686570E99F}.Release|x64.Build.0 = Release|x64
 		{515F74DD-D4D8-4B61-8C77-A2686570E99F}.Release|x86.ActiveCfg = Release|Win32
 		{515F74DD-D4D8-4B61-8C77-A2686570E99F}.Release|x86.Build.0 = Release|Win32
+		{86DE18DE-0C77-46C6-8ADF-1F6486FB9909}.Debug|x64.ActiveCfg = Debug|x64
+		{86DE18DE-0C77-46C6-8ADF-1F6486FB9909}.Debug|x64.Build.0 = Debug|x64
+		{86DE18DE-0C77-46C6-8ADF-1F6486FB9909}.Debug|x86.ActiveCfg = Debug|Win32
+		{86DE18DE-0C77-46C6-8ADF-1F6486FB9909}.Debug|x86.Build.0 = Debug|Win32
+		{86DE18DE-0C77-46C6-8ADF-1F6486FB9909}.Release|x64.ActiveCfg = Release|x64
+		{86DE18DE-0C77-46C6-8ADF-1F6486FB9909}.Release|x64.Build.0 = Release|x64
+		{86DE18DE-0C77-46C6-8ADF-1F6486FB9909}.Release|x86.ActiveCfg = Release|Win32
+		{86DE18DE-0C77-46C6-8ADF-1F6486FB9909}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

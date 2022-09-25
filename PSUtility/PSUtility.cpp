@@ -12,7 +12,7 @@ int wmain(int argc, wchar_t* argv)
     while (true)
     {
         HANDLE currentThread = GetCurrentThread();
-        std::wcout << L"LLUtility.exe process id: ";
+        std::wcout << L"PSUtility.exe process id: ";
         std::wcout << GetProcessIdOfThread(currentThread) << std:: endl;
         CloseHandle(currentThread);
         if (res == NULL) 

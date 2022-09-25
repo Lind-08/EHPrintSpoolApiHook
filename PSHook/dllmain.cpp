@@ -3,20 +3,84 @@
 
 std::wstring hookMessage;
 std::wofstream outputFile;
-std::string path = "D:\\hookLog.txt";
 std::wstring processPath;
 
-void writeToLog(std::wstring message)
-{
-	using namespace std::chrono;
-	system_clock::time_point today = system_clock::now();
-	time_t tt;
-	tt = system_clock::to_time_t ( today );
+WSADATA wsData;
+SOCKET sock;
 
-	outputFile.open(path, std::fstream::app);
+bool initWSA(WSADATA *data)
+{
+	auto err = WSAStartup(MAKEWORD(2,2), data);
+	if (err != 0)
+	{ 
+		std::cerr << "Error WinSock version initializaion #";
+		std::cerr << WSAGetLastError();
+		return false;
+	}
+	else
+		return true;
+}
+
+bool initSocket(SOCKET &sock)
+{
+	sock = socket(AF_INET, SOCK_STREAM, 0);
+
+	if (sock == INVALID_SOCKET) {
+		std::cerr << "Error initialization socket # " << WSAGetLastError() << std::endl; 
+		closesocket(sock);
+		return false;
+	}
+	else
+	{
+		std::cerr << "Server socket initialization is OK" << std::endl;
+		return true;
+	}
+}
+
+bool connectSocket (SOCKET &sock, DWORD port)
+{
+	sockaddr_in servInfo;
+	ZeroMemory(&servInfo, sizeof(servInfo));	
+				
+	servInfo.sin_family = AF_INET;
 #pragma warning(suppress : 4996)	
-	outputFile << ctime(&tt)  << " " << message << L" PID: " << GetCurrentProcessId() << L" EXE: " << processPath << std::endl;
-	outputFile.close();
+	servInfo.sin_addr.S_un.S_addr = inet_addr("127.0.0.1");
+	servInfo.sin_port = htons(port);
+
+	auto err = connect(sock, (sockaddr*)&servInfo, sizeof(servInfo));
+	if ( err != 0 ) {
+		std::cerr << "Connection to Server is FAILED. Error # " << WSAGetLastError() << std::endl;
+		return false;
+	}
+	else 
+	{
+		std::cerr << "Connection established SUCCESSFULLY. Ready to send a message to Server" << std::endl;
+		return true;
+	}
+}
+
+void writeToLog(std::wstring message, SOCKET &sock)
+{
+	std::wstring outMessage;
+	std::wostringstream outStream;
+	auto tt = time(nullptr);
+#pragma warning(suppress : 4996)	
+	auto* ti = localtime(&tt);
+	outStream << std::put_time<wchar_t>(ti, L"%c") << " " << message << L" PID: " << GetCurrentProcessId() << L" EXE: " << processPath << std::endl;
+	outMessage = outStream.str();
+	if (sock != INVALID_SOCKET)
+	{
+		using convert_type = std::codecvt_utf8<wchar_t>;
+		std::wstring_convert<convert_type, wchar_t> converter;
+		std::string converted_str = converter.to_bytes( outMessage );
+		auto bytes = converted_str.c_str();
+		int length = converted_str.length();
+		int sended = 0;
+		do
+		{
+			sended += send(sock, bytes + sended, length - sended,0);
+		}while (sended != length);
+	}
 }
 
 BOOL WINAPI myOpenPrinterA(
@@ -25,7 +89,9 @@ BOOL WINAPI myOpenPrinterA(
   _In_  LPPRINTER_DEFAULTSA pDefault
 )
 {
-	writeToLog(L"OpenPrinterA called");
+	std::wostringstream outStream;
+	outStream << L"OpenPrinterA called.";
+	writeToLog(outStream.str(), sock);
 	return OpenPrinterA(pPrinterName, phPrinter, pDefault);
 }
 
@@ -35,7 +101,9 @@ BOOL WINAPI myOpenPrinterW(
   _In_  LPPRINTER_DEFAULTS pDefault
 )
 {
-	writeToLog(L"OpenPrinterW called");
+	std::wostringstream outStream;
+	outStream << L"OpenPrinterA called.";
+	writeToLog(outStream.str(), sock);
 	return OpenPrinterW(pPrinterName, phPrinter, pDefault);
 }
 
@@ -45,7 +113,9 @@ BOOL WINAPI myGetDefaultPrinterW(
   _Inout_ LPDWORD pcchBuffer
 )
 {
-	writeToLog(L"GetDefaultPrinterW called");
+	std::wostringstream outStream;
+	outStream << L"GetDefaultPrinterW called.";
+	writeToLog(outStream.str(), sock);
 	return GetDefaultPrinterW(pszBuffer, pcchBuffer);
 }
 
@@ -54,13 +124,15 @@ BOOL WINAPI myGetDefaultPrinterA(
   _Inout_ LPDWORD pcchBuffer
 )
 {
-	writeToLog(L"GetDefaultPrinterA called");
+	std::wostringstream outStream;
+	outStream << L"GetDefaultPrinterA called.";
+	writeToLog(outStream.str(), sock);
 	return GetDefaultPrinterA(pszBuffer, pcchBuffer);
 }
 
 void __stdcall NativeInjectionEntryPoint(REMOTE_ENTRY_INFO* inRemoteInfo)
 {
-	std::wcout << "\n\nNativeInjectionEntryPointt(REMOTE_ENTRY_INFO* inRemoteInfo)\n\n" <<
+	std::cout << "\n\nNativeInjectionEntryPointt(REMOTE_ENTRY_INFO* inRemoteInfo)\n\n" <<
 		"IIIII           jjj               tt                dd !!! \n"
 		" III  nn nnn          eee    cccc tt      eee       dd !!! \n"
 		" III  nnn  nn   jjj ee   e cc     tttt  ee   e  dddddd !!! \n"
@@ -68,7 +140,7 @@ void __stdcall NativeInjectionEntryPoint(REMOTE_ENTRY_INFO* inRemoteInfo)
 		"IIIII nn   nn   jjj  eeeee  ccccc  tttt  eeeee  dddddd !!! \n"
 		"              jjjj                                         \n\n";
 
-	std::wcout << "Injected by process Id: " << inRemoteInfo->HostPID << std::endl;
+	std::cout << "Injected by process Id: " << inRemoteInfo->HostPID << std::endl;
 
 	if (inRemoteInfo->UserDataSize != NULL)
 	{
@@ -174,6 +246,9 @@ void __stdcall NativeInjectionEntryPoint(REMOTE_ENTRY_INFO* inRemoteInfo)
 	LhSetExclusiveACL(ACLEntries, 1, &hHook1);
 	LhSetExclusiveACL(ACLEntries, 1, &hHook2);
 	LhSetExclusiveACL(ACLEntries, 1, &hHook3);
+	initWSA(&wsData);
+    initSocket(sock);
+	connectSocket(sock, 31313);
 	FreeLibrary(winspl);
 	return;
 }
