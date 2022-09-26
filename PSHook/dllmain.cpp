@@ -8,6 +8,52 @@ std::wstring processPath;
 WSADATA wsData;
 SOCKET sock;
 
+std::string WINAPI GetLastErrorAsString(DWORD errorMessageID)
+{
+    //Get the error message ID, if any.
+    if(errorMessageID == 0) {
+        return std::string(); //No error message has been recorded
+    }
+    
+    LPSTR messageBuffer = nullptr;
+
+    //Ask Win32 to give us the string version of that message ID.
+    //The parameters we pass in, tell Win32 to create the buffer that holds the message for us (because we don't yet know how long the message string will be).
+    size_t size = FormatMessageA(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
+                                 NULL, errorMessageID, MAKELANGID(LANG_ENGLISH, SUBLANG_ENGLISH_US), (LPSTR)&messageBuffer, 0, NULL);
+    
+    //Copy the error message into a std::string.
+    std::string message(messageBuffer, size);
+    
+    //Free the Win32's string's buffer.
+    LocalFree(messageBuffer);
+            
+    return message;
+}
+
+std::wstring WINAPI GetLastErrorAsStringW(DWORD errorMessageID)
+{
+    //Get the error message ID, if any.
+    if(errorMessageID == 0) {
+        return std::wstring(); //No error message has been recorded
+    }
+    
+    LPWSTR messageBuffer = nullptr;
+
+    //Ask Win32 to give us the string version of that message ID.
+    //The parameters we pass in, tell Win32 to create the buffer that holds the message for us (because we don't yet know how long the message string will be).
+    size_t size = FormatMessageW(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
+                                 NULL, errorMessageID, MAKELANGID(LANG_ENGLISH, SUBLANG_ENGLISH_US), (LPWSTR)&messageBuffer, 0, NULL);
+    
+    //Copy the error message into a std::string.
+    std::wstring message(messageBuffer, size);
+    
+    //Free the Win32's string's buffer.
+    LocalFree(messageBuffer);
+            
+    return message;
+}
+
 bool initWSA(WSADATA *data)
 {
 	auto err = WSAStartup(MAKEWORD(2,2), data);
@@ -59,7 +105,7 @@ bool connectSocket (SOCKET &sock, DWORD port)
 	}
 }
 
-void writeToLog(std::wstring message, SOCKET &sock)
+void WINAPI writeToLog(std::wstring message, SOCKET &sock)
 {
 	std::wstring outMessage;
 	std::wostringstream outStream;
@@ -91,8 +137,53 @@ BOOL WINAPI myOpenPrinterA(
 {
 	std::wostringstream outStream;
 	outStream << L"OpenPrinterA called.";
+	auto res = OpenPrinterA(pPrinterName, phPrinter, pDefault);
+	auto err = GetLastError();
+	if (pPrinterName == NULL)
+		outStream << " [pPrinterName]: NULL";
+	else
+		outStream << " [pPrinterName]: " << pPrinterName;
+	if (phPrinter == NULL)
+		outStream << " [phPrinter] <- NULL";
+	else
+		outStream << " [phPrinter] <- " << (unsigned long) phPrinter;
+	if (pDefault == NULL)
+		outStream << " [pDefault]: NULL";
+	else
+	{
+		if (pDefault->DesiredAccess != NULL)
+		{
+			outStream << " [pDefault.DesiredAccess]: ";
+			if ((pDefault->DesiredAccess & PRINTER_ACCESS_ADMINISTER) != 0)
+			outStream << " PRINTER_ACCESS_ADMINISTER";
+			if ((pDefault->DesiredAccess & PRINTER_ACCESS_USE) != 0)
+				outStream << " PRINTER_ACCESS_USE";
+			#if (NTDDI_VERSION >= NTDDI_WINBLUE)
+			if ((pDefault->DesiredAccess & PRINTER_ACCESS_MANAGE_LIMITED) != 0)
+				outStream << " PRINTER_ACCESS_MANAGE_LIMITED";
+			#endif // (NTDDI_VERSION >= NTDDI_WINBLUE)
+			if ((pDefault->DesiredAccess & PRINTER_ALL_ACCESS) != 0)
+				outStream << " PRINTER_ALL_ACCESS";
+			if ((pDefault->DesiredAccess & DELETE) != 0)
+				outStream << " DELETE";
+			if ((pDefault->DesiredAccess & READ_CONTROL) != 0)
+				outStream << " READ_CONTROL";
+			if ((pDefault->DesiredAccess & SYNCHRONIZE) != 0)
+				outStream << " SYNCHRONIZE";
+			if ((pDefault->DesiredAccess & WRITE_DAC) != 0)
+				outStream << " WRITE_DAC";
+			if ((pDefault->DesiredAccess & WRITE_OWNER) != 0)
+				outStream << " WRITE_OWNER";
+		}
+		else 
+			outStream << " [pDefault.DesiredAccess]: NULL";
+	}
+	if (res == FALSE)
+		outStream << " [return] <- FALSE [error] " << err << " |";
+	else
+		outStream << " [return] <- TRUE |";
 	writeToLog(outStream.str(), sock);
-	return OpenPrinterA(pPrinterName, phPrinter, pDefault);
+	return res;
 }
 
 BOOL WINAPI myOpenPrinterW(
@@ -103,8 +194,53 @@ BOOL WINAPI myOpenPrinterW(
 {
 	std::wostringstream outStream;
 	outStream << L"OpenPrinterA called.";
+	auto res = OpenPrinterW(pPrinterName, phPrinter, pDefault);
+	auto err = GetLastError();
+	if (pPrinterName == NULL)
+		outStream << " [pPrinterName]: NULL";
+	else
+		outStream << " [pPrinterName]: " << pPrinterName;
+	if (phPrinter == NULL)
+		outStream << " [phPrinter] <- NULL";
+	else
+		outStream << " [phPrinter] <- " << (unsigned long) phPrinter;
+	if (pDefault == NULL)
+		outStream << " [pDefault]: NULL";
+	else
+	{
+		if (pDefault->DesiredAccess != NULL)
+		{
+			outStream << " [pDefault.DesiredAccess]: ";
+			if ((pDefault->DesiredAccess & PRINTER_ACCESS_ADMINISTER) != 0)
+			outStream << " PRINTER_ACCESS_ADMINISTER";
+			if ((pDefault->DesiredAccess & PRINTER_ACCESS_USE) != 0)
+				outStream << " PRINTER_ACCESS_USE";
+			#if (NTDDI_VERSION >= NTDDI_WINBLUE)
+			if ((pDefault->DesiredAccess & PRINTER_ACCESS_MANAGE_LIMITED) != 0)
+				outStream << " PRINTER_ACCESS_MANAGE_LIMITED";
+			#endif // (NTDDI_VERSION >= NTDDI_WINBLUE)
+			if ((pDefault->DesiredAccess & PRINTER_ALL_ACCESS) != 0)
+				outStream << " PRINTER_ALL_ACCESS";
+			if ((pDefault->DesiredAccess & DELETE) != 0)
+				outStream << " DELETE";
+			if ((pDefault->DesiredAccess & READ_CONTROL) != 0)
+				outStream << " READ_CONTROL";
+			if ((pDefault->DesiredAccess & SYNCHRONIZE) != 0)
+				outStream << " SYNCHRONIZE";
+			if ((pDefault->DesiredAccess & WRITE_DAC) != 0)
+				outStream << " WRITE_DAC";
+			if ((pDefault->DesiredAccess & WRITE_OWNER) != 0)
+				outStream << " WRITE_OWNER";
+		}
+		else 
+			outStream << " [pDefault.DesiredAccess]: NULL";
+	}
+	if (res == FALSE)
+		outStream << " [return] <- FALSE [error] " << err << " |";
+	else
+		outStream << " [return] <- TRUE |";
 	writeToLog(outStream.str(), sock);
-	return OpenPrinterW(pPrinterName, phPrinter, pDefault);
+	return res;
 }
 
 
@@ -115,8 +251,19 @@ BOOL WINAPI myGetDefaultPrinterW(
 {
 	std::wostringstream outStream;
 	outStream << L"GetDefaultPrinterW called.";
+	auto res = GetDefaultPrinterW(pszBuffer, pcchBuffer);
+	auto err = GetLastError();
+	if (pszBuffer == NULL)
+	{
+		outStream << L" [pszBuffer]: NULL [pcchBuffer] <- " << *pcchBuffer; 	
+		outStream << " [return] <- FALSE [error] " << err << " |";
+	}
+	else 
+	{
+		outStream << L" [pszBuffer] <- \"" << pszBuffer << "\" [pcchBuffer] <- " << *pcchBuffer << " [return] TRUE |"; 
+	}
 	writeToLog(outStream.str(), sock);
-	return GetDefaultPrinterW(pszBuffer, pcchBuffer);
+	return res;
 }
 
 BOOL WINAPI myGetDefaultPrinterA(
@@ -126,8 +273,19 @@ BOOL WINAPI myGetDefaultPrinterA(
 {
 	std::wostringstream outStream;
 	outStream << L"GetDefaultPrinterA called.";
+	auto res = GetDefaultPrinterA(pszBuffer, pcchBuffer);
+	auto err = GetLastError();
+	if (pszBuffer == NULL)
+	{
+		outStream << L" [pszBuffer]: NULL [pcchBuffer] <- " << *pcchBuffer; 	
+		outStream << " [return] <- FALSE [error] " << err << " |";
+	}
+	else 
+	{
+		outStream << L" [pszBuffer] <- \"" << pszBuffer << "\" [pcchBuffer] <- " << *pcchBuffer << " [return] TRUE |"; 
+	}
 	writeToLog(outStream.str(), sock);
-	return GetDefaultPrinterA(pszBuffer, pcchBuffer);
+	return res;
 }
 
 void __stdcall NativeInjectionEntryPoint(REMOTE_ENTRY_INFO* inRemoteInfo)
