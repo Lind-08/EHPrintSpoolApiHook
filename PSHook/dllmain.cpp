@@ -129,6 +129,32 @@ void WINAPI writeToLog(std::wstring message, SOCKET &sock)
 	}
 }
 
+std::wstring AnalyzeAndPrintDesiredAccessFlags(DWORD Flags)
+{
+	std::wostringstream outStream;
+	if ((Flags & PRINTER_ACCESS_ADMINISTER) != 0)
+	outStream << " PRINTER_ACCESS_ADMINISTER";
+	if ((Flags & PRINTER_ACCESS_USE) != 0)
+		outStream << " PRINTER_ACCESS_USE";
+	#if (NTDDI_VERSION >= NTDDI_WINBLUE)
+	if ((Flags & PRINTER_ACCESS_MANAGE_LIMITED) != 0)
+		outStream << " PRINTER_ACCESS_MANAGE_LIMITED";
+	#endif // (NTDDI_VERSION >= NTDDI_WINBLUE)
+	if ((Flags & PRINTER_ALL_ACCESS) != 0)
+		outStream << " PRINTER_ALL_ACCESS";
+	if ((Flags & DELETE) != 0)
+		outStream << " DELETE";
+	if ((Flags & READ_CONTROL) != 0)
+		outStream << " READ_CONTROL";
+	if ((Flags & SYNCHRONIZE) != 0)
+		outStream << " SYNCHRONIZE";
+	if ((Flags & WRITE_DAC) != 0)
+		outStream << " WRITE_DAC";
+	if ((Flags & WRITE_OWNER) != 0)
+		outStream << " WRITE_OWNER";
+	return outStream.str();
+}
+
 BOOL WINAPI myOpenPrinterA(
   _In_  LPSTR             pPrinterName,
   _Out_ LPHANDLE           phPrinter,
@@ -154,26 +180,7 @@ BOOL WINAPI myOpenPrinterA(
 		if (pDefault->DesiredAccess != NULL)
 		{
 			outStream << " [pDefault.DesiredAccess]: ";
-			if ((pDefault->DesiredAccess & PRINTER_ACCESS_ADMINISTER) != 0)
-			outStream << " PRINTER_ACCESS_ADMINISTER";
-			if ((pDefault->DesiredAccess & PRINTER_ACCESS_USE) != 0)
-				outStream << " PRINTER_ACCESS_USE";
-			#if (NTDDI_VERSION >= NTDDI_WINBLUE)
-			if ((pDefault->DesiredAccess & PRINTER_ACCESS_MANAGE_LIMITED) != 0)
-				outStream << " PRINTER_ACCESS_MANAGE_LIMITED";
-			#endif // (NTDDI_VERSION >= NTDDI_WINBLUE)
-			if ((pDefault->DesiredAccess & PRINTER_ALL_ACCESS) != 0)
-				outStream << " PRINTER_ALL_ACCESS";
-			if ((pDefault->DesiredAccess & DELETE) != 0)
-				outStream << " DELETE";
-			if ((pDefault->DesiredAccess & READ_CONTROL) != 0)
-				outStream << " READ_CONTROL";
-			if ((pDefault->DesiredAccess & SYNCHRONIZE) != 0)
-				outStream << " SYNCHRONIZE";
-			if ((pDefault->DesiredAccess & WRITE_DAC) != 0)
-				outStream << " WRITE_DAC";
-			if ((pDefault->DesiredAccess & WRITE_OWNER) != 0)
-				outStream << " WRITE_OWNER";
+			outStream << AnalyzeAndPrintDesiredAccessFlags(pDefault->DesiredAccess);
 		}
 		else 
 			outStream << " [pDefault.DesiredAccess]: NULL";
@@ -211,26 +218,7 @@ BOOL WINAPI myOpenPrinterW(
 		if (pDefault->DesiredAccess != NULL)
 		{
 			outStream << " [pDefault.DesiredAccess]: ";
-			if ((pDefault->DesiredAccess & PRINTER_ACCESS_ADMINISTER) != 0)
-			outStream << " PRINTER_ACCESS_ADMINISTER";
-			if ((pDefault->DesiredAccess & PRINTER_ACCESS_USE) != 0)
-				outStream << " PRINTER_ACCESS_USE";
-			#if (NTDDI_VERSION >= NTDDI_WINBLUE)
-			if ((pDefault->DesiredAccess & PRINTER_ACCESS_MANAGE_LIMITED) != 0)
-				outStream << " PRINTER_ACCESS_MANAGE_LIMITED";
-			#endif // (NTDDI_VERSION >= NTDDI_WINBLUE)
-			if ((pDefault->DesiredAccess & PRINTER_ALL_ACCESS) != 0)
-				outStream << " PRINTER_ALL_ACCESS";
-			if ((pDefault->DesiredAccess & DELETE) != 0)
-				outStream << " DELETE";
-			if ((pDefault->DesiredAccess & READ_CONTROL) != 0)
-				outStream << " READ_CONTROL";
-			if ((pDefault->DesiredAccess & SYNCHRONIZE) != 0)
-				outStream << " SYNCHRONIZE";
-			if ((pDefault->DesiredAccess & WRITE_DAC) != 0)
-				outStream << " WRITE_DAC";
-			if ((pDefault->DesiredAccess & WRITE_OWNER) != 0)
-				outStream << " WRITE_OWNER";
+			outStream << AnalyzeAndPrintDesiredAccessFlags(pDefault->DesiredAccess);
 		}
 		else 
 			outStream << " [pDefault.DesiredAccess]: NULL";
@@ -288,6 +276,108 @@ BOOL WINAPI myGetDefaultPrinterA(
 	return res;
 }
 
+std::wstring AnalyzeAndPrintEnumPrintersFlags(DWORD Flags)
+{
+	std::wostringstream outStream;
+	if ((Flags & PRINTER_ENUM_LOCAL) != 0)
+	outStream << " PRINTER_ENUM_LOCAL";
+	if ((Flags & PRINTER_ENUM_NAME) != 0)
+		outStream << " PRINTER_ENUM_NAME";
+	if ((Flags & PRINTER_ENUM_SHARED) != 0)
+		outStream << " PRINTER_ENUM_SHARED";
+	if ((Flags & PRINTER_ENUM_CONNECTIONS) != 0)
+		outStream << " PRINTER_ENUM_CONNECTIONS";
+	if ((Flags & PRINTER_ENUM_NETWORK) != 0)
+		outStream << " PRINTER_ENUM_NETWORK";
+	if ((Flags & PRINTER_ENUM_REMOTE) != 0)
+		outStream << " PRINTER_ENUM_REMOTE";
+	#if (NTDDI_VERSION >= NTDDI_WINBLUE)
+	if ((Flags & PRINTER_ENUM_CATEGORY_3D) != 0)
+		outStream << " PRINTER_ENUM_CATEGORY_3D";
+	if ((Flags & PRINTER_ENUM_CATEGORY_ALL) != 0)
+		outStream << " PRINTER_ENUM_CATEGORY_ALL";
+	#endif // (NTDDI_VERSION >= NTDDI_WINBLUE)
+	return outStream.str();
+}
+
+BOOL WINAPI myEnumPrintersA(
+  _In_  DWORD   Flags,
+  _In_  LPSTR  Name,
+  _In_  DWORD   Level,
+  _Out_ LPBYTE  pPrinterEnum,
+  _In_  DWORD   cbBuf,
+  _Out_ LPDWORD pcbNeeded,
+  _Out_ LPDWORD pcReturned)
+{
+	std::wostringstream outStream;
+	outStream << L"EnumPrintersA called.";
+	auto res = EnumPrintersA(Flags, Name, Level, pPrinterEnum, cbBuf, pcbNeeded, pcReturned);
+	auto err = GetLastError();
+	outStream << " [Flags]: ";
+	outStream << AnalyzeAndPrintEnumPrintersFlags(Flags);
+	outStream << " [Name]: ";
+	if (Name == NULL)
+		outStream << "NULL";
+	else
+		outStream << Name;
+	outStream << " [Level]: " << Level;
+	outStream << " [pPrinterEnum]: "; 
+	if (pPrinterEnum == NULL)
+		outStream << "NULL";
+	else
+		outStream << *pPrinterEnum;
+	outStream << " [cbBuf]: " << cbBuf; 
+	outStream << " [pcbNeeded] <- " << *pcbNeeded; 
+	outStream << " [pcReturned] <- " << *pcReturned;
+	if (res == NULL)
+	{
+		outStream << " [return] <- FALSE [error] " << err << " |";
+	}
+	else 
+		outStream << " [return] <- TRUE |";
+	writeToLog(outStream.str(), sock);
+	return res;
+}
+
+BOOL WINAPI myEnumPrintersW(
+  _In_  DWORD   Flags,
+  _In_  LPTSTR  Name,
+  _In_  DWORD   Level,
+  _Out_ LPBYTE  pPrinterEnum,
+  _In_  DWORD   cbBuf,
+  _Out_ LPDWORD pcbNeeded,
+  _Out_ LPDWORD pcReturned)
+{
+	std::wostringstream outStream;
+	outStream << L"EnumPrintersW called.";
+	auto res = EnumPrintersW(Flags, Name, Level, pPrinterEnum, cbBuf, pcbNeeded, pcReturned);
+	auto err = GetLastError();
+	outStream << " [Flags]: ";
+	outStream << AnalyzeAndPrintEnumPrintersFlags(Flags);
+	outStream << " [Name]: ";
+	if (Name == NULL)
+		outStream << "NULL";
+	else
+		outStream << Name;
+	outStream << " [Level]: " << Level;
+	outStream << " [pPrinterEnum]: "; 
+	if (pPrinterEnum == NULL)
+		outStream << "NULL";
+	else
+		outStream << *pPrinterEnum;
+	outStream << " [cbBuf]: " << cbBuf; 
+	outStream << " [pcbNeeded] <- " << *pcbNeeded; 
+	outStream << " [pcReturned] <- " << *pcReturned;
+	if (res == NULL)
+	{
+		outStream << " [return] <- FALSE [error] " << err << " |";
+	}
+	else 
+		outStream << " [return] <- TRUE |";
+	writeToLog(outStream.str(), sock);
+	return res;
+}
+
 void __stdcall NativeInjectionEntryPoint(REMOTE_ENTRY_INFO* inRemoteInfo)
 {
 	std::cout << "\n\nNativeInjectionEntryPointt(REMOTE_ENTRY_INFO* inRemoteInfo)\n\n" <<
@@ -306,10 +396,12 @@ void __stdcall NativeInjectionEntryPoint(REMOTE_ENTRY_INFO* inRemoteInfo)
 	}
 
 	// Perform hooking
-	HOOK_TRACE_INFO hHook = { NULL }; // keep track of our hook
-	HOOK_TRACE_INFO hHook1 = { NULL }; // keep track of our hook
-	HOOK_TRACE_INFO hHook2 = { NULL }; // keep track of our hook
-	HOOK_TRACE_INFO hHook3 = { NULL }; // keep track of our hook
+	HOOK_TRACE_INFO OpenPrinterAHook = { NULL }; // keep track of our hook
+	HOOK_TRACE_INFO OpenPrinterWHook = { NULL }; // keep track of our hook
+	HOOK_TRACE_INFO GetDefaultPrinterWHook = { NULL }; // keep track of our hook
+	HOOK_TRACE_INFO GetDefaultPrinterAHook = { NULL }; // keep track of our hook
+	HOOK_TRACE_INFO EnumPrintersAHook = { NULL }; // keep track of our hook
+	HOOK_TRACE_INFO EnumPrintersWHook = { NULL }; // keep track of our hook
 
 	auto winspl = LoadLibraryW(L"winspool.drv");
 
@@ -327,6 +419,9 @@ void __stdcall NativeInjectionEntryPoint(REMOTE_ENTRY_INFO* inRemoteInfo)
 
 	std::cout << std::endl << "Win32 OpenPrinterW found at address: " << GetProcAddress(winspl, "OpenPrinterW") << "\n";
 
+	std::cout << std::endl << "Win32 EnumPrintersA found at address: " << GetProcAddress(winspl, "EnumPrintersA") << "\n";
+
+	std::cout << std::endl << "Win32 EnumPrintersW found at address: " << GetProcAddress(winspl, "EnumPrintersW") << "\n";
 
 	// Install the hook
 
@@ -334,7 +429,7 @@ void __stdcall NativeInjectionEntryPoint(REMOTE_ENTRY_INFO* inRemoteInfo)
 		GetProcAddress(winspl, "OpenPrinterA"),
 		myOpenPrinterA,
 		NULL,
-		&hHook);
+		&OpenPrinterAHook);
 	if (FAILED(result))
 	{
 		std::wstring s(RtlGetLastErrorString());
@@ -351,7 +446,7 @@ void __stdcall NativeInjectionEntryPoint(REMOTE_ENTRY_INFO* inRemoteInfo)
 		GetProcAddress(winspl, "OpenPrinterW"),
 		myOpenPrinterW,
 		NULL,
-		&hHook1);
+		&OpenPrinterWHook);
 	if (FAILED(result))
 	{
 		std::wstring s(RtlGetLastErrorString());
@@ -367,7 +462,7 @@ void __stdcall NativeInjectionEntryPoint(REMOTE_ENTRY_INFO* inRemoteInfo)
 		GetProcAddress(winspl, "GetDefaultPrinterW"),
 		myGetDefaultPrinterW,
 		NULL,
-		&hHook2);
+		&GetDefaultPrinterWHook);
 	if (FAILED(result))
 	{
 		std::wstring s(RtlGetLastErrorString());
@@ -383,7 +478,7 @@ void __stdcall NativeInjectionEntryPoint(REMOTE_ENTRY_INFO* inRemoteInfo)
 		GetProcAddress(winspl, "GetDefaultPrinterA"),
 		myGetDefaultPrinterA,
 		NULL,
-		&hHook3);
+		&GetDefaultPrinterAHook);
 	if (FAILED(result))
 	{
 		std::wstring s(RtlGetLastErrorString());
@@ -395,15 +490,50 @@ void __stdcall NativeInjectionEntryPoint(REMOTE_ENTRY_INFO* inRemoteInfo)
 		std::cout << "Hook 'GetDefaultPrinterA installed successfully." << std::endl;
 	}
 
+	result = LhInstallHook(
+		GetProcAddress(winspl, "EnumPrintersA"),
+		myEnumPrintersA,
+		NULL,
+		&EnumPrintersAHook);
+	if (FAILED(result))
+	{
+		std::wstring s(RtlGetLastErrorString());
+		std::wcout << "Failed to install hook: ";
+		std::wcout << s;
+	}
+	else 
+	{
+		std::cout << "Hook 'EnumPrintersA installed successfully." << std::endl;
+	}
+
+	result = LhInstallHook(
+		GetProcAddress(winspl, "EnumPrintersW"),
+		myEnumPrintersW,
+		NULL,
+		&EnumPrintersWHook);
+	if (FAILED(result))
+	{
+		std::wstring s(RtlGetLastErrorString());
+		std::wcout << "Failed to install hook: ";
+		std::wcout << s;
+	}
+	else 
+	{
+		std::cout << "Hook 'EnumPrintersW installed successfully." << std::endl;
+	}
+
+
 	// If the threadId in the ACL is set to 0,
 	// then internally EasyHook uses GetCurrentThreadId()
 	ULONG ACLEntries[1] = { 0 };
 
 	// Disable the hook for the provided threadIds, enable for all others
-	LhSetExclusiveACL(ACLEntries, 1, &hHook);
-	LhSetExclusiveACL(ACLEntries, 1, &hHook1);
-	LhSetExclusiveACL(ACLEntries, 1, &hHook2);
-	LhSetExclusiveACL(ACLEntries, 1, &hHook3);
+	LhSetExclusiveACL(ACLEntries, 1, &OpenPrinterAHook);
+	LhSetExclusiveACL(ACLEntries, 1, &OpenPrinterWHook);
+	LhSetExclusiveACL(ACLEntries, 1, &GetDefaultPrinterWHook);
+	LhSetExclusiveACL(ACLEntries, 1, &GetDefaultPrinterAHook);
+	LhSetExclusiveACL(ACLEntries, 1, &EnumPrintersAHook);
+	LhSetExclusiveACL(ACLEntries, 1, &EnumPrintersWHook);
 	initWSA(&wsData);
     initSocket(sock);
 	connectSocket(sock, 31313);
