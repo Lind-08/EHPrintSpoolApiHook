@@ -112,7 +112,7 @@ void WINAPI writeToLog(std::wstring message, SOCKET &sock)
 	auto tt = time(nullptr);
 #pragma warning(suppress : 4996)	
 	auto* ti = localtime(&tt);
-	outStream << std::put_time<wchar_t>(ti, L"%c") << " " << message << L" PID: " << GetCurrentProcessId() << L" EXE: " << processPath << std::endl;
+	outStream << std::put_time<wchar_t>(ti, L"%c") << " " << message << L"\n PID: " << GetCurrentProcessId() << L"\n EXE: " << processPath << std::endl;
 	outMessage = outStream.str();
 	if (sock != INVALID_SOCKET)
 	{
@@ -166,24 +166,24 @@ BOOL WINAPI myOpenPrinterA(
 	auto res = OpenPrinterA(pPrinterName, phPrinter, pDefault);
 	auto err = GetLastError();
 	if (pPrinterName == NULL)
-		outStream << " [pPrinterName]: NULL";
+		outStream << " [pPrinterName]: NULL\n";
 	else
-		outStream << " [pPrinterName]: " << pPrinterName;
+		outStream << " [pPrinterName]: " << "\"" << pPrinterName << "\"" << "\n";
 	if (phPrinter == NULL)
-		outStream << " [phPrinter] <- NULL";
+		outStream << " [phPrinter] <- NULL\n";
 	else
-		outStream << " [phPrinter] <- " << (unsigned long) phPrinter;
+		outStream << " [phPrinter] <- " << (unsigned long) phPrinter << "\n";
 	if (pDefault == NULL)
-		outStream << " [pDefault]: NULL";
+		outStream << " [pDefault]: NULL\n";
 	else
 	{
 		if (pDefault->DesiredAccess != NULL)
 		{
 			outStream << " [pDefault.DesiredAccess]: ";
-			outStream << AnalyzeAndPrintDesiredAccessFlags(pDefault->DesiredAccess);
+			outStream << AnalyzeAndPrintDesiredAccessFlags(pDefault->DesiredAccess) << "\n";
 		}
 		else 
-			outStream << " [pDefault.DesiredAccess]: NULL";
+			outStream << " [pDefault.DesiredAccess]: NULL\n";
 	}
 	if (res == FALSE)
 		outStream << " [return] <- FALSE [error] " << err << " |";
@@ -200,28 +200,28 @@ BOOL WINAPI myOpenPrinterW(
 )
 {
 	std::wostringstream outStream;
-	outStream << L"OpenPrinterA called.";
+	outStream << L"OpenPrinterA called.\n";
 	auto res = OpenPrinterW(pPrinterName, phPrinter, pDefault);
 	auto err = GetLastError();
 	if (pPrinterName == NULL)
-		outStream << " [pPrinterName]: NULL";
+		outStream << " [pPrinterName]: NULL\n";
 	else
-		outStream << " [pPrinterName]: " << pPrinterName;
+		outStream << " [pPrinterName]: " << "\"" << pPrinterName << "\"" << "\n";
 	if (phPrinter == NULL)
-		outStream << " [phPrinter] <- NULL";
+		outStream << " [phPrinter] <- NULL\n";
 	else
-		outStream << " [phPrinter] <- " << (unsigned long) phPrinter;
+		outStream << " [phPrinter] <- " << (unsigned long) phPrinter << "\n";
 	if (pDefault == NULL)
-		outStream << " [pDefault]: NULL";
+		outStream << " [pDefault]: NULL\n";
 	else
 	{
 		if (pDefault->DesiredAccess != NULL)
 		{
 			outStream << " [pDefault.DesiredAccess]: ";
-			outStream << AnalyzeAndPrintDesiredAccessFlags(pDefault->DesiredAccess);
+			outStream << AnalyzeAndPrintDesiredAccessFlags(pDefault->DesiredAccess) << "\n";
 		}
 		else 
-			outStream << " [pDefault.DesiredAccess]: NULL";
+			outStream << " [pDefault.DesiredAccess]: NULL\n";
 	}
 	if (res == FALSE)
 		outStream << " [return] <- FALSE [error] " << err << " |";
@@ -238,17 +238,17 @@ BOOL WINAPI myGetDefaultPrinterW(
 )
 {
 	std::wostringstream outStream;
-	outStream << L"GetDefaultPrinterW called.";
+	outStream << L"GetDefaultPrinterW called.\n";
 	auto res = GetDefaultPrinterW(pszBuffer, pcchBuffer);
 	auto err = GetLastError();
 	if (pszBuffer == NULL)
 	{
-		outStream << L" [pszBuffer]: NULL [pcchBuffer] <- " << *pcchBuffer; 	
-		outStream << " [return] <- FALSE [error] " << err << " |";
+		outStream << L" [pszBuffer]: NULL \n [pcchBuffer] <- " << *pcchBuffer << "\n"; 	
+		outStream << " [return] <- FALSE\n [error] " << err << " |";
 	}
 	else 
 	{
-		outStream << L" [pszBuffer] <- \"" << pszBuffer << "\" [pcchBuffer] <- " << *pcchBuffer << " [return] TRUE |"; 
+		outStream << L" [pszBuffer] <- \"" << pszBuffer << "\"\n [pcchBuffer] <- " << *pcchBuffer << " \n [return] <- TRUE |"; 
 	}
 	writeToLog(outStream.str(), sock);
 	return res;
@@ -260,17 +260,17 @@ BOOL WINAPI myGetDefaultPrinterA(
 )
 {
 	std::wostringstream outStream;
-	outStream << L"GetDefaultPrinterA called.";
+	outStream << L"GetDefaultPrinterA called.\n";
 	auto res = GetDefaultPrinterA(pszBuffer, pcchBuffer);
 	auto err = GetLastError();
 	if (pszBuffer == NULL)
 	{
-		outStream << L" [pszBuffer]: NULL [pcchBuffer] <- " << *pcchBuffer; 	
-		outStream << " [return] <- FALSE [error] " << err << " |";
+		outStream << L" [pszBuffer]: NULL \n [pcchBuffer] <- " << *pcchBuffer << "\n"; 	
+		outStream << " [return] <- FALSE\n [error] " << err << " |";
 	}
 	else 
 	{
-		outStream << L" [pszBuffer] <- \"" << pszBuffer << "\" [pcchBuffer] <- " << *pcchBuffer << " [return] TRUE |"; 
+		outStream << L" [pszBuffer] <- \"" << pszBuffer << "\"\n [pcchBuffer] <- " << *pcchBuffer << " \n [return] <- TRUE |"; 
 	}
 	writeToLog(outStream.str(), sock);
 	return res;
@@ -310,25 +310,25 @@ BOOL WINAPI myEnumPrintersA(
   _Out_ LPDWORD pcReturned)
 {
 	std::wostringstream outStream;
-	outStream << L"EnumPrintersA called.";
+	outStream << L"EnumPrintersA called.\n";
 	auto res = EnumPrintersA(Flags, Name, Level, pPrinterEnum, cbBuf, pcbNeeded, pcReturned);
 	auto err = GetLastError();
 	outStream << " [Flags]: ";
-	outStream << AnalyzeAndPrintEnumPrintersFlags(Flags);
+	outStream << AnalyzeAndPrintEnumPrintersFlags(Flags) << "\n";
 	outStream << " [Name]: ";
 	if (Name == NULL)
-		outStream << "NULL";
+		outStream << "NULL\n";
 	else
-		outStream << Name;
-	outStream << " [Level]: " << Level;
+		outStream << Name << "\n";
+	outStream << " [Level]: " << Level << "\n";
 	outStream << " [pPrinterEnum]: "; 
 	if (pPrinterEnum == NULL)
-		outStream << "NULL";
+		outStream << "NULL\n";
 	else
-		outStream << *pPrinterEnum;
-	outStream << " [cbBuf]: " << cbBuf; 
-	outStream << " [pcbNeeded] <- " << *pcbNeeded; 
-	outStream << " [pcReturned] <- " << *pcReturned;
+		outStream << *pPrinterEnum << "\n";
+	outStream << " [cbBuf]: " << cbBuf << "\n"; 
+	outStream << " [pcbNeeded] <- " << *pcbNeeded << "\n"; 
+	outStream << " [pcReturned] <- " << *pcReturned << "\n";
 	if (res == NULL)
 	{
 		outStream << " [return] <- FALSE [error] " << err << " |";
@@ -349,25 +349,25 @@ BOOL WINAPI myEnumPrintersW(
   _Out_ LPDWORD pcReturned)
 {
 	std::wostringstream outStream;
-	outStream << L"EnumPrintersW called.";
+	outStream << L"EnumPrintersW called.\n";
 	auto res = EnumPrintersW(Flags, Name, Level, pPrinterEnum, cbBuf, pcbNeeded, pcReturned);
 	auto err = GetLastError();
 	outStream << " [Flags]: ";
-	outStream << AnalyzeAndPrintEnumPrintersFlags(Flags);
+	outStream << AnalyzeAndPrintEnumPrintersFlags(Flags) << "\n";
 	outStream << " [Name]: ";
 	if (Name == NULL)
-		outStream << "NULL";
+		outStream << "NULL\n";
 	else
-		outStream << Name;
-	outStream << " [Level]: " << Level;
+		outStream << Name << "\n";
+	outStream << " [Level]: " << Level << "\n";
 	outStream << " [pPrinterEnum]: "; 
 	if (pPrinterEnum == NULL)
-		outStream << "NULL";
+		outStream << "NULL\n";
 	else
-		outStream << *pPrinterEnum;
-	outStream << " [cbBuf]: " << cbBuf; 
-	outStream << " [pcbNeeded] <- " << *pcbNeeded; 
-	outStream << " [pcReturned] <- " << *pcReturned;
+		outStream << *pPrinterEnum << "\n";
+	outStream << " [cbBuf]: " << cbBuf << "\n"; 
+	outStream << " [pcbNeeded] <- " << *pcbNeeded << "\n"; 
+	outStream << " [pcReturned] <- " << *pcReturned << "\n";
 	if (res == NULL)
 	{
 		outStream << " [return] <- FALSE [error] " << err << " |";
