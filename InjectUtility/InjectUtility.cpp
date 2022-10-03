@@ -66,8 +66,8 @@ int wmain(int argc, wchar_t* argv[])
     }
 
 
-    wchar_t* dllToInject32 = (wchar_t*)L"..\\Debug\\PSHook32.dll";
-    wchar_t* dllToInject64 = (wchar_t*)L"..\\Debug\\PSHook64.dll";
+    wchar_t* dllToInject32 = (wchar_t*)L".\\PSHook32.dll";
+    wchar_t* dllToInject64 = (wchar_t*)L".\\PSHook64.dll";
     std::wstring processPath = getProcessInformation(process_id);
     int length = processPath.length() + 1; 
     wchar_t *buff = new wchar_t[length];
