@@ -112,7 +112,7 @@ void WINAPI writeToLog(std::wstring message, SOCKET &sock)
 	auto tt = time(nullptr);
 #pragma warning(suppress : 4996)	
 	auto* ti = localtime(&tt);
-	outStream << std::put_time<wchar_t>(ti, L"%c") << " " << message << L"\n PID: " << GetCurrentProcessId() << L"\n EXE: " << processPath << std::endl;
+	outStream << std::put_time<wchar_t>(ti, L"%c") << " " << message << L"\n PID: " << GetCurrentProcessId() << L"\n EXE: " << processPath << "\n" << std::endl;
 	outMessage = outStream.str();
 	if (sock != INVALID_SOCKET)
 	{
@@ -616,7 +616,7 @@ BOOL WINAPI myEnumPrintersA(
 	else
 	{
 		std::wstring printerEnumOut = GetPrinterEnumOutA(pPrinterEnum, Level, *pcReturned);
-		outStream << "\n" << printerEnumOut << "\n";
+		outStream << "\n" << printerEnumOut;
 	}
 	outStream << " [cbBuf]: " << cbBuf << "\n"; 
 	outStream << " [pcbNeeded] <- " << *pcbNeeded << "\n"; 
@@ -658,7 +658,7 @@ BOOL WINAPI myEnumPrintersW(
 	else
 	{
 		std::wstring printerEnumOut = GetPrinterEnumOutW(pPrinterEnum, Level, *pcReturned);
-		outStream << "\n" << printerEnumOut << "\n";
+		outStream << "\n" << printerEnumOut;
 	}
 	outStream << " [cbBuf]: " << cbBuf << "\n"; 
 	outStream << " [pcbNeeded] <- " << *pcbNeeded << "\n"; 
