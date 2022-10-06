@@ -83,7 +83,7 @@ bool initSocket(SOCKET &sock)
 	}
 }
 
-bool connectSocket (SOCKET &sock, DWORD port)
+bool connectSocket (SOCKET &sock, u_short port)
 {
 	sockaddr_in servInfo;
 	ZeroMemory(&servInfo, sizeof(servInfo));	
@@ -172,7 +172,7 @@ BOOL WINAPI myOpenPrinterA(
 	if (phPrinter == NULL)
 		outStream << " [phPrinter] <- NULL\n";
 	else
-		outStream << " [phPrinter] <- " << (unsigned long) phPrinter << "\n";
+		outStream << " [phPrinter] <- " << phPrinter << "\n";
 	if (pDefault == NULL)
 		outStream << " [pDefault]: NULL\n";
 	else
@@ -210,7 +210,7 @@ BOOL WINAPI myOpenPrinterW(
 	if (phPrinter == NULL)
 		outStream << " [phPrinter] <- NULL\n";
 	else
-		outStream << " [phPrinter] <- " << (unsigned long) phPrinter << "\n";
+		outStream << " [phPrinter] <- " << phPrinter << "\n";
 	if (pDefault == NULL)
 		outStream << " [pDefault]: NULL\n";
 	else
@@ -300,6 +300,295 @@ std::wstring AnalyzeAndPrintEnumPrintersFlags(DWORD Flags)
 	return outStream.str();
 }
 
+
+
+std::wstring AnalyzeAndPrintPrinterInfo1Flags(DWORD Flags)
+{
+	std::wostringstream outStream;
+	if ((Flags & PRINTER_ENUM_EXPAND) != 0)
+		outStream << " PRINTER_ENUM_EXPAND";
+	if ((Flags & PRINTER_ENUM_CONTAINER) != 0)
+		outStream << " PRINTER_ENUM_CONTAINER";
+	if ((Flags & PRINTER_ENUM_ICON1) != 0)
+		outStream << " PRINTER_ENUM_ICON1";
+	if ((Flags & PRINTER_ENUM_ICON2) != 0)
+		outStream << " PRINTER_ENUM_ICON2";
+	if ((Flags & PRINTER_ENUM_ICON3) != 0)
+		outStream << " PRINTER_ENUM_ICON3";
+	if ((Flags & PRINTER_ENUM_ICON4) != 0)
+		outStream << " PRINTER_ENUM_ICON4";
+	if ((Flags & PRINTER_ENUM_ICON5) != 0)
+		outStream << " PRINTER_ENUM_ICON5";
+	if ((Flags & PRINTER_ENUM_ICON6) != 0)
+		outStream << " PRINTER_ENUM_ICON6";
+	if ((Flags & PRINTER_ENUM_ICON7) != 0)
+		outStream << " PRINTER_ENUM_ICON7";
+	if ((Flags & PRINTER_ENUM_ICON8) != 0)
+		outStream << " PRINTER_ENUM_ICON8";
+	return outStream.str();
+}
+
+std::wstring AnalyzeAndPrintPrinterInfo4Attributes(DWORD Attributes)
+{
+	std::wostringstream outStream;
+	if ((Attributes & PRINTER_ATTRIBUTE_LOCAL) != 0)
+		outStream << " PRINTER_ATTRIBUTE_LOCAL";
+	if ((Attributes & PRINTER_ATTRIBUTE_NETWORK) != 0)
+		outStream << " PRINTER_ATTRIBUTE_NETWORK";
+	return outStream.str();
+}
+
+std::wstring AnalyzeAndPrintPrinterInfo2_5Attributes(DWORD Attributes)
+{
+	std::wostringstream outStream;
+	if ((Attributes & PRINTER_ATTRIBUTE_DIRECT) != 0)
+		outStream << " PRINTER_ATTRIBUTE_DIRECT";
+	if ((Attributes & PRINTER_ATTRIBUTE_DO_COMPLETE_FIRST) != 0)
+		outStream << " PRINTER_ATTRIBUTE_DO_COMPLETE_FIRST";
+	if ((Attributes & PRINTER_ATTRIBUTE_ENABLE_DEVQ) != 0)
+		outStream << " PRINTER_ATTRIBUTE_ENABLE_DEVQ";
+	if ((Attributes & PRINTER_ATTRIBUTE_HIDDEN) != 0)
+		outStream << " PRINTER_ATTRIBUTE_HIDDEN";
+	if ((Attributes & PRINTER_ATTRIBUTE_KEEPPRINTEDJOBS) != 0)
+		outStream << " PRINTER_ATTRIBUTE_KEEPPRINTEDJOBS";
+	if ((Attributes & PRINTER_ATTRIBUTE_LOCAL) != 0)
+		outStream << " PRINTER_ATTRIBUTE_NETWORK";
+	if ((Attributes & PRINTER_ATTRIBUTE_PUBLISHED) != 0)
+		outStream << " PRINTER_ATTRIBUTE_PUBLISHED";
+	if ((Attributes & PRINTER_ATTRIBUTE_QUEUED) != 0)
+		outStream << " PRINTER_ATTRIBUTE_QUEUED";
+	if ((Attributes & PRINTER_ATTRIBUTE_RAW_ONLY) != 0)
+		outStream << " PRINTER_ATTRIBUTE_RAW_ONLY";
+	if ((Attributes & PRINTER_ATTRIBUTE_SHARED) != 0)
+		outStream << " PRINTER_ATTRIBUTE_SHARED";
+	#if (NTDDI_VERSION >= NTDDI_WINXP)
+	if ((Attributes & PRINTER_ATTRIBUTE_FAX) != 0)
+		outStream << " PRINTER_ATTRIBUTE_FAX";
+	#endif // (NTDDI_VERSION >= NTDDI_WINXP)
+	#if (NTDDI_VERSION >= NTDDI_VISTA)
+	if ((Attributes & PRINTER_ATTRIBUTE_FRIENDLY_NAME) != 0)
+		outStream << " PRINTER_ATTRIBUTE_FRIENDLY_NAME";
+	if ((Attributes & PRINTER_ATTRIBUTE_PUSHED_MACHINE) != 0)
+		outStream << " PRINTER_ATTRIBUTE_PUSHED_MACHINE";
+	if ((Attributes & PRINTER_ATTRIBUTE_MACHINE) != 0)
+		outStream << " PRINTER_ATTRIBUTE_MACHINE";
+	if ((Attributes & PRINTER_ATTRIBUTE_FRIENDLY_NAME) != 0)
+		outStream << " PRINTER_ATTRIBUTE_FRIENDLY_NAME";
+	if ((Attributes & PRINTER_ATTRIBUTE_TS_GENERIC_DRIVER) != 0)
+		outStream << " PRINTER_ATTRIBUTE_TS_GENERIC_DRIVER";
+	#endif // (NTDDI_VERSION >= NTDDI_VISTA)
+	return outStream.str();
+}
+
+std::wstring AnalyzeAndPrintPrinterInfo2Status(DWORD Status)
+{
+	std::wostringstream outStream;
+	if ((Status & PRINTER_STATUS_BUSY) != 0)
+		outStream << " PRINTER_STATUS_BUSY";
+	if ((Status & PRINTER_STATUS_DOOR_OPEN) != 0)
+		outStream << " PRINTER_STATUS_DOOR_OPEN";
+	if ((Status & PRINTER_STATUS_ERROR) != 0)
+		outStream << " PRINTER_STATUS_ERROR";
+	if ((Status & PRINTER_STATUS_INITIALIZING) != 0)
+		outStream << " PRINTER_STATUS_INITIALIZING";
+	if ((Status & PRINTER_STATUS_IO_ACTIVE) != 0)
+		outStream << " PRINTER_STATUS_IO_ACTIVE";
+	if ((Status & PRINTER_STATUS_MANUAL_FEED) != 0)
+		outStream << " PRINTER_STATUS_MANUAL_FEED";
+	if ((Status & PRINTER_STATUS_NO_TONER) != 0)
+		outStream << " PRINTER_STATUS_NO_TONER";
+	if ((Status & PRINTER_STATUS_NOT_AVAILABLE) != 0)
+		outStream << " PRINTER_STATUS_NOT_AVAILABLE";
+	if ((Status & PRINTER_STATUS_OFFLINE) != 0)
+		outStream << " PRINTER_STATUS_OFFLINE";
+	if ((Status & PRINTER_STATUS_OUT_OF_MEMORY) != 0)
+		outStream << " PRINTER_STATUS_OUT_OF_MEMORY";
+	if ((Status & PRINTER_STATUS_OUTPUT_BIN_FULL) != 0)
+		outStream << " PRINTER_STATUS_OUTPUT_BIN_FULL";
+	if ((Status & PRINTER_STATUS_PAGE_PUNT) != 0)
+		outStream << " PRINTER_STATUS_PAGE_PUNT";
+	if ((Status & PRINTER_STATUS_PAPER_JAM) != 0)
+		outStream << " PRINTER_STATUS_PAPER_JAM";
+	if ((Status & PRINTER_STATUS_PAPER_OUT) != 0)
+		outStream << " PRINTER_STATUS_PAPER_OUT";
+	if ((Status & PRINTER_STATUS_PAPER_PROBLEM) != 0)
+		outStream << " PRINTER_STATUS_PAPER_PROBLEM";
+	if ((Status & PRINTER_STATUS_PAUSED) != 0)
+		outStream << " PRINTER_STATUS_PAUSED";
+	if ((Status & PRINTER_STATUS_PENDING_DELETION) != 0)
+		outStream << " PRINTER_STATUS_PENDING_DELETION";
+	if ((Status & PRINTER_STATUS_POWER_SAVE) != 0)
+		outStream << " PRINTER_STATUS_POWER_SAVE";
+	if ((Status & PRINTER_STATUS_PRINTING) != 0)
+		outStream << " PRINTER_STATUS_PRINTING";
+	if ((Status & PRINTER_STATUS_PROCESSING) != 0)
+		outStream << " PRINTER_STATUS_PROCESSING";
+	if ((Status & PRINTER_STATUS_SERVER_UNKNOWN) != 0)
+		outStream << " PRINTER_STATUS_SERVER_UNKNOWN";
+	if ((Status & PRINTER_STATUS_TONER_LOW) != 0)
+		outStream << " PRINTER_STATUS_TONER_LOW";
+	if ((Status & PRINTER_STATUS_USER_INTERVENTION) != 0)
+		outStream << " PRINTER_STATUS_USER_INTERVENTION";
+	if ((Status & PRINTER_STATUS_USER_INTERVENTION) != 0)
+		outStream << " PRINTER_STATUS_USER_INTERVENTION";
+	if ((Status & PRINTER_STATUS_WAITING) != 0)
+		outStream << " PRINTER_STATUS_WAITING";
+	return outStream.str();
+}
+
+std::wstring ParcePrinterInfo1W(PRINTER_INFO_1W* pPrinterEnum)
+{
+	if (pPrinterEnum == nullptr)
+		return std::wstring();
+	std::wstringstream outStream;
+	outStream << " [Flags]: " << AnalyzeAndPrintPrinterInfo1Flags(pPrinterEnum->Flags) << "\n";
+	outStream << " [pDescription]: " << (pPrinterEnum->pDescription == NULL ? L"NULL" : pPrinterEnum->pDescription)<< "\n";
+	outStream << " [pName]: " << (pPrinterEnum->pName == NULL ? L"NULL" : pPrinterEnum->pName)<< "\n";
+	outStream << " [pComment]: " << (pPrinterEnum->pComment == NULL ? L"NULL" : pPrinterEnum->pComment)<< "\n";
+	return outStream.str();
+}
+
+std::wstring ParcePrinterInfo2W(PRINTER_INFO_2W* pPrinterEnum)
+{
+	if (pPrinterEnum == nullptr)
+		return std::wstring();
+	std::wstringstream outStream;
+	outStream << " [pServerName]: " << (pPrinterEnum->pServerName == NULL ? L"NULL" : pPrinterEnum->pServerName)<< "\n";
+	outStream << " [pPrinterName]: " << (pPrinterEnum->pPrinterName == NULL ? L"NULL" : pPrinterEnum->pPrinterName)<< "\n";
+	outStream << " [pShareName]: " << (pPrinterEnum->pShareName == NULL ? L"NULL" : pPrinterEnum->pShareName)<< "\n";
+	outStream << " [pPortName]: " << (pPrinterEnum->pPortName == NULL ? L"NULL" : pPrinterEnum->pPortName)<< "\n";
+	outStream << " [pDriverName]: " << (pPrinterEnum->pDriverName == NULL ? L"NULL" : pPrinterEnum->pDriverName)<< "\n";
+	outStream << " [pComment]: " << (pPrinterEnum->pComment == NULL ? L"NULL" : pPrinterEnum->pComment)<< "\n";
+	outStream << " [pLocation]: " << (pPrinterEnum->pLocation == NULL ? L"NULL" : pPrinterEnum->pLocation)<< "\n";
+	outStream << " [pSepFile]: " << (pPrinterEnum->pSepFile == NULL ? L"NULL" : pPrinterEnum->pSepFile)<< "\n";
+	outStream << " [pPrintProcessor]: " << (pPrinterEnum->pPrintProcessor == NULL ? L"NULL" : pPrinterEnum->pPrintProcessor)<< "\n";
+	outStream << " [pDatatype]: " << (pPrinterEnum->pDatatype == NULL ? L"NULL" : pPrinterEnum->pDatatype)<< "\n";
+	outStream << " [pParameters]: " << (pPrinterEnum->pParameters == NULL ? L"NULL" : pPrinterEnum->pParameters)<< "\n";
+	outStream << " [Attributes]: " << AnalyzeAndPrintPrinterInfo2_5Attributes(pPrinterEnum->Attributes) << "\n";
+	outStream << " [Priority]: " << pPrinterEnum->Priority << "\n";
+	outStream << " [DefaultPriority]: " << pPrinterEnum->DefaultPriority << "\n";
+	outStream << " [StartTime]: " << pPrinterEnum->StartTime << "\n";
+	outStream << " [UntilTime]: " << pPrinterEnum->UntilTime << "\n";
+	outStream << " [Status]: " << AnalyzeAndPrintPrinterInfo2Status(pPrinterEnum->Status) << "\n";
+	outStream << " [cJobs]: " << pPrinterEnum->cJobs << "\n";
+	outStream << " [AveragePPM]: " << pPrinterEnum->AveragePPM << "\n";
+	return outStream.str();
+}
+
+std::wstring ParcePrinterInfo4W(PRINTER_INFO_4W* pPrinterEnum)
+{
+	if (pPrinterEnum == nullptr)
+		return std::wstring();
+	std::wstringstream outStream;
+	outStream << " [pPrinterName]: " << (pPrinterEnum->pPrinterName == NULL ? L"NULL" : pPrinterEnum->pPrinterName)<< "\n";
+	outStream << " [pServerName]: " << (pPrinterEnum->pServerName == NULL ? L"NULL" : pPrinterEnum->pServerName)<< "\n";
+	outStream << " [Attributes]: " << AnalyzeAndPrintPrinterInfo4Attributes(pPrinterEnum->Attributes) << "\n";
+	return outStream.str();
+}
+
+std::wstring ParcePrinterInfo5W(PRINTER_INFO_5W* pPrinterEnum)
+{
+	if (pPrinterEnum == nullptr)
+		return std::wstring();
+	std::wstringstream outStream;
+	outStream << " [pPrinterName]: " << (pPrinterEnum->pPrinterName == NULL ? L"NULL" : pPrinterEnum->pPrinterName)<< "\n";
+	outStream << " [pPortName]: " << (pPrinterEnum->pPortName == NULL ? L"NULL" : pPrinterEnum->pPortName)<< "\n";
+	outStream << " [Attributes]: " << AnalyzeAndPrintPrinterInfo2_5Attributes(pPrinterEnum->Attributes) << "\n";
+	return outStream.str();
+}
+
+std::wstring ParcePrinterEnum(PRINTER_INFO_1W* pPrinterEnum, DWORD length)
+{
+	std::wostringstream outStream;
+	for (size_t i = 0; i < length; i++)
+	{
+		outStream << "PRINTER_INFO_1W " << i + 1 << "\n";
+		outStream << ParcePrinterInfo1W(pPrinterEnum + i);
+	}
+	return outStream.str();
+}
+
+std::wstring ParcePrinterEnum(PRINTER_INFO_2W* pPrinterEnum, DWORD length)
+{
+	std::wostringstream outStream;
+	for (size_t i = 0; i < length; i++)
+	{
+		outStream << "PRINTER_INFO_2W " << i + 1 << "\n";
+		outStream << ParcePrinterInfo2W(pPrinterEnum + i);
+	}
+	return outStream.str();
+}
+
+std::wstring ParcePrinterEnum(PRINTER_INFO_3* pPrinterEnum, DWORD length)
+{
+	return L"";
+}
+
+std::wstring ParcePrinterEnum(PRINTER_INFO_4W* pPrinterEnum, DWORD length)
+{
+	std::wostringstream outStream;
+	for (size_t i = 0; i < length; i++)
+	{
+		outStream << "PRINTER_INFO_4W " << i + 1 << "\n";
+		outStream << ParcePrinterInfo4W(pPrinterEnum + i);
+	}
+	return outStream.str();
+}
+
+std::wstring ParcePrinterEnum(PRINTER_INFO_5W* pPrinterEnum, DWORD length)
+{
+	std::wostringstream outStream;
+	for (size_t i = 0; i < length; i++)
+	{
+		outStream << "PRINTER_INFO_5W " << i + 1 << "\n";
+		outStream << ParcePrinterInfo5W(pPrinterEnum + i);
+	}
+	return outStream.str();
+}
+
+std::wstring GetPrinterEnumOutA(LPBYTE pPrinterEnum, DWORD level, DWORD length)
+{
+	return L"";
+}
+
+std::wstring GetPrinterEnumOutW(LPBYTE pPrinterEnum, DWORD level, DWORD length)
+{
+	std::wstring result;
+	switch (level)
+	{
+	case 1:
+	{
+		auto printers = reinterpret_cast<PRINTER_INFO_1W*>(pPrinterEnum);
+		result = ParcePrinterEnum(printers, length);
+	}break;
+	case 2:
+	{
+		auto printers = reinterpret_cast<PRINTER_INFO_2W*>(pPrinterEnum);
+		result = ParcePrinterEnum(printers, length);
+	}break;
+	case 3:
+	{
+		auto printers = reinterpret_cast<PRINTER_INFO_3*>(pPrinterEnum);
+		result = ParcePrinterEnum(printers, length);
+	}break;
+	case 4:
+	{
+		auto printers = reinterpret_cast<PRINTER_INFO_4W*>(pPrinterEnum);
+		result = ParcePrinterEnum(printers, length);
+	}break;
+	case 5:
+	{
+		auto printers = reinterpret_cast<PRINTER_INFO_5W*>(pPrinterEnum);
+		result = ParcePrinterEnum(printers, length);
+	}break;
+	
+	default:
+		break;
+	}
+	return result;
+}
+
+
 BOOL WINAPI myEnumPrintersA(
   _In_  DWORD   Flags,
   _In_  LPSTR  Name,
@@ -325,7 +614,10 @@ BOOL WINAPI myEnumPrintersA(
 	if (pPrinterEnum == NULL)
 		outStream << "NULL\n";
 	else
-		outStream << *pPrinterEnum << "\n";
+	{
+		std::wstring printerEnumOut = GetPrinterEnumOutA(pPrinterEnum, Level, *pcReturned);
+		outStream << "\n" << printerEnumOut << "\n";
+	}
 	outStream << " [cbBuf]: " << cbBuf << "\n"; 
 	outStream << " [pcbNeeded] <- " << *pcbNeeded << "\n"; 
 	outStream << " [pcReturned] <- " << *pcReturned << "\n";
@@ -364,7 +656,10 @@ BOOL WINAPI myEnumPrintersW(
 	if (pPrinterEnum == NULL)
 		outStream << "NULL\n";
 	else
-		outStream << *pPrinterEnum << "\n";
+	{
+		std::wstring printerEnumOut = GetPrinterEnumOutW(pPrinterEnum, Level, *pcReturned);
+		outStream << "\n" << printerEnumOut << "\n";
+	}
 	outStream << " [cbBuf]: " << cbBuf << "\n"; 
 	outStream << " [pcbNeeded] <- " << *pcbNeeded << "\n"; 
 	outStream << " [pcReturned] <- " << *pcReturned << "\n";
